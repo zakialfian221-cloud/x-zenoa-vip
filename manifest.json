@@ -1,0 +1,15 @@
+{
+  "name": "R3X PANEL FF",
+  "short_name": "R3X PANEL",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#ff0000",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3534/3534062.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
