@@ -3,117 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R3X V2 OVERLORD | BG KIY</title>
+    <title>R3X V3 - THE DIGITAL NEXUS</title>
     <link rel="manifest" href="manifest.json">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Share+Tech+Mono&display=swap');
         
-        :root { --neon: #ff0000; --bg: #050000; --darker: #000; }
+        :root { --neon: #ff0000; --bg: #050000; }
         
         body {
             background-color: var(--bg); color: #fff;
-            font-family: 'Share Tech Mono', monospace; margin: 0; padding: 15px;
-            overflow-x: hidden; border: 1px solid #222; min-height: 95vh;
-            background-image: 
-                linear-gradient(rgba(255, 0, 0, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.05) 1px, transparent 1px);
-            background-size: 30px 30px;
+            font-family: 'Share Tech Mono', monospace; margin: 0; padding: 10px;
+            background-image: radial-gradient(circle, #200000 0%, #000 100%);
+            border: 2px solid #300; min-height: 98vh; overflow-x: hidden;
         }
 
-        /* SCANNING LINE EFFECT */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 2px;
-            background: rgba(255, 0, 0, 0.2); z-index: 10;
-            animation: scan 4s linear infinite;
+        /* ANIMASI RADAR */
+        .radar {
+            position: fixed; top: 50%; left: 50%; width: 200px; height: 200px;
+            border: 1px solid rgba(255,0,0,0.2); border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 0;
         }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-        .header { text-align: center; margin-bottom: 25px; border: 1px solid var(--neon); padding: 15px; background: rgba(0,0,0,0.8); position: relative;}
-        .header h1 { font-family: 'Orbitron', sans-serif; color: var(--neon); text-shadow: 0 0 15px var(--neon); margin: 0; font-size: 20px; letter-spacing: 3px; }
-        .header p { font-size: 10px; color: #666; margin: 5px 0 0 0; }
-
-        /* VIP GRID */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .box { background: rgba(15,0,0,0.9); border: 1px solid #300; padding: 10px; position: relative; overflow: hidden;}
-        .box::before { content: ""; position: absolute; top: 0; left: 0; width: 5px; height: 5px; border-top: 2px solid var(--neon); border-left: 2px solid var(--neon); }
-        .box-title { font-size: 10px; color: var(--neon); margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #200; padding-bottom: 3px;}
-
-        /* SWITCH TOGGLE */
-        .switch-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; }
-        .status-on { color: #00ff00; text-shadow: 0 0 5px #00ff00; font-weight: bold; }
-
-        /* SENSI AREA */
-        .sensi-row { font-size: 10px; color: #888; margin-top: 5px; }
-        input[type=range] { width: 100%; accent-color: var(--neon); height: 4px; }
-
-        /* LAUNCHER BUTTON */
-        .btn-launch {
-            width: 100%; padding: 20px; background: linear-gradient(90deg, #300, #ff0000, #300);
-            color: #fff; border: none; font-family: 'Orbitron'; font-weight: 900;
-            cursor: pointer; letter-spacing: 5px; position: relative;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); margin-top: 15px;
+        .radar::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,0,0,0.4));
+            border-radius: 50%; animation: rotate 3s linear infinite;
         }
-        .btn-launch:active { transform: scale(0.98); }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
 
-        .footer { text-align: center; font-size: 8px; color: #444; margin-top: 30px; letter-spacing: 2px; }
+        .header { text-align: center; margin-bottom: 20px; z-index: 5; position: relative; }
+        .header h1 { font-family: 'Orbitron'; font-size: 22px; color: var(--neon); text-shadow: 0 0 20px var(--neon); margin: 0; }
+
+        /* FLOATING MENU STYLE */
+        .card {
+            background: rgba(10,0,0,0.85); border: 1px solid #400;
+            padding: 12px; margin-bottom: 10px; position: relative; z-index: 5;
+            backdrop-filter: blur(5px); box-shadow: 0 0 10px rgba(255,0,0,0.1);
+        }
+        .card-title { font-size: 11px; color: var(--neon); border-bottom: 1px solid #400; margin-bottom: 8px; font-weight: bold; }
+
+        .btn-action {
+            width: 100%; padding: 12px; background: #900; color: #fff;
+            border: 1px solid var(--neon); font-family: 'Orbitron'; cursor: pointer;
+            margin-top: 5px; font-weight: bold; font-size: 12px;
+        }
+
+        /* LIVE COORDINATES */
+        #coords { font-size: 9px; color: #0f0; margin: 10px 0; height: 15px; }
+
+        /* PULSING STATUS */
+        .dot { height: 8px; width: 8px; background-color: #0f0; border-radius: 50%; display: inline-block; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
+    <div class="radar"></div>
+
     <div class="header">
-        <h1>R3X OVERLORD V2</h1>
-        <p>IDENTITAS USER: BG KIY [COMMISSIONER]</p>
+        <h1>R3X PANEL V3</h1>
+        <div id="coords">X: 192.168.1.1 | Y: 0.00342</div>
+        <div style="font-size: 10px;"><span class="dot"></span> SYSTEM ONLINE: BG KIY</div>
     </div>
 
-    <div class="grid">
-        <div class="box">
-            <div class="box-title">AIM ASSIST SYSTEM</div>
-            <div class="switch-row">Aimbot <span class="status-on">ON</span></div>
-            <div class="switch-row">Auto HS <span class="status-on">ON</span></div>
-            <div class="switch-row">FOV Aim <span>360&deg;</span></div>
+    <div class="card">
+        <div class="card-title">MODUL INJEKSI (AUTO ON)</div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;">
+            <span>ANTENNA VIEW</span> <span style="color:#0f0">ACTIVE</span>
         </div>
-        <div class="box">
-            <div class="box-title">ESP VISUALS</div>
-            <div class="switch-row">Line <span class="status-on">ON</span></div>
-            <div class="switch-row">Box <span class="status-on">ON</span></div>
-            <div class="switch-row">Distance <span class="status-on">ON</span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:5px;">
+            <span>AUTO HEADSHOT</span> <span style="color:#0f0">99%</span>
         </div>
     </div>
 
-    <div class="box" style="margin-bottom: 15px;">
-        <div class="box-title">MODIFIKASI SENSI VIP</div>
-        <div class="sensi-row">XY-SENSITIVITY [100%]</div>
-        <input type="range" value="100">
-        <div class="sensi-row">DRAG-SHOT POWER [95%]</div>
-        <input type="range" value="95">
+    <div class="card">
+        <div class="card-title">SETTINGAN SENSI VIP</div>
+        <button class="btn-action" onclick="copySensi()" style="background:#222; font-size:10px;">COPY DATA CONFIG</button>
     </div>
 
-    <div class="box">
-        <div class="box-title">DEVICE OPTIMIZER</div>
-        <div class="switch-row">RAM Boost <span class="status-on">ULTRA</span></div>
-        <div class="switch-row">FPS Lock <span>120 FPS</span></div>
-        <div class="switch-row">Ping Stabilizer <span class="status-on">STABLE</span></div>
+    <div class="card">
+        <div class="card-title">VIRTUAL LAUNCHER</div>
+        <button class="btn-action" onclick="launchGame()">EXECUTE & OPEN FF</button>
     </div>
 
-    <button class="btn-launch" onclick="launchFF()">LAUNCH FREE FIRE</button>
-
-    <div class="footer">
-        ENCRYPTED BY BG KIY PROJECT &copy; 2026<br>
-        SECURITY LEVEL: MAXIMUM
+    <div style="text-align: center; color: #444; font-size: 8px; margin-top: 20px;">
+        SECURITY BYPASS: BYPASSED <br>
+        DEVELOPED BY R3X CLOUD
     </div>
 
-    <audio id="sfx" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="soundEnter" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
 
     <script>
-        function launchFF() {
-            document.getElementById('sfx').play();
-            alert("MENGAKTIFKAN PANEL R3X... \nPROSES INJEKSI BERHASIL!\n\nMembuka Free Fire...");
+        // Efek koordinat jalan terus
+        setInterval(() => {
+            let x = Math.random() * 1000;
+            let y = Math.random() * 1000;
+            document.getElementById('coords').innerText = `X: ${x.toFixed(4)} | Y: ${y.toFixed(4)} | TARGET: LOCKED`;
+        }, 100);
+
+        function copySensi() {
+            navigator.clipboard.writeText("Sensi FF: 100, 95, 80, 75 (R3X CONFIG)");
+            alert("CONFIG BERHASIL DISALIN!\nTempel di folder data Free Fire lo, BG KIY.");
+        }
+
+        function launchGame() {
+            document.getElementById('soundEnter').play();
+            alert("MENGAKTIFKAN FLOATING OVERLAY...\nSISTEM SIAP DIGUNAKAN!");
             
-            // PERINTAH UNTUK BUKA APLIKASI FF (DEEP LINK)
-            // Ini akan mencoba membuka FF kalau sudah terinstall di HP
-            setTimeout(function() {
+            // Mencoba membuka FF
+            setTimeout(() => {
                 window.location.href = "intent:#Intent;package=com.dts.freefireth;end";
-            }, 1500);
+            }, 1000);
         }
     </script>
 </body>
