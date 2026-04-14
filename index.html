@@ -144,13 +144,18 @@
         }
 
         function execute() {
-            document.getElementById('snd-inject').play();
-            speak("Injection process complete. Opening Free Fire now. Good luck, BG KIY.");
-            addLog("Executing Deep Link...");
-            setTimeout(() => {
-                window.location.href = "intent:#Intent;package=com.dts.freefireth;end";
-            }, 2000);
+    document.getElementById('snd-inject').play();
+    speak("Injeksi selesai. Membuka Free Fire sekarang.");
+    addLog("Forcing Application Launch...");
+
+    // TEKNIK DEEP LINK BRUTE FORCE
+    setTimeout(() => {
+        // Coba buka pake skema langsung
+        window.location.href = "freefire://"; 
+        
+        // Backup kalau cara di atas gagal (Ganti ke Intent yang lebih keras)
+        setTimeout(() => {
+            window.location.href = "intent:#Intent;package=com.dts.freefireth;component=com.dts.freefireth/com.dts.freefireth.MainActivity;end";
+        }, 500);
+    }, 1500);
         }
-    </script>
-</body>
-            </html>
