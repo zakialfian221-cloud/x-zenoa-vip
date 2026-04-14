@@ -3,108 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R3X V3 SUPREME | BG KIY</title>
-    <link rel="manifest" href="manifest.json">
+    <title>R3X V4 ULTIMATE | BG KIY</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Share+Tech+Mono&display=swap');
         
-        :root { --neon: #ff0000; --bg: #050000; --glow: rgba(255, 0, 0, 0.5); }
+        :root { --neon: #ff0000; --bg: #030000; --glow: 0 0 15px rgba(255, 0, 0, 0.7); }
         
         body {
             background-color: var(--bg); color: #fff;
-            font-family: 'Share Tech Mono', monospace; margin: 0; padding: 10px;
-            min-height: 98vh; overflow-x: hidden;
-            border: 2px solid #200;
+            font-family: 'Share Tech Mono', monospace; margin: 0; padding: 15px;
+            min-height: 100vh; overflow-x: hidden;
+            border: 2px solid #300;
         }
 
-        /* HEADER DENGAN ANIMASI */
-        .header { text-align: center; margin-bottom: 15px; border: 1px solid var(--neon); padding: 10px; box-shadow: 0 0 15px var(--glow); }
-        .header h1 { font-family: 'Orbitron'; font-size: 20px; color: var(--neon); margin: 0; letter-spacing: 2px; }
-
-        /* LOG INJECTOR (BIAR KEREN) */
-        #log-box {
-            background: #000; border: 1px solid #333; height: 80px; 
-            font-size: 9px; color: #0f0; overflow-y: hidden; padding: 5px; margin-bottom: 15px;
+        /* ANIMASI BACKGROUND SCAN */
+        body::after {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(255,0,0,0.03) 0px, rgba(255,0,0,0.03) 1px, transparent 1px, transparent 2px);
+            pointer-events: none; z-index: 10;
         }
 
-        /* CARD STYLE */
+        .header { 
+            text-align: center; margin-bottom: 20px; border: 2px double var(--neon); 
+            padding: 15px; background: rgba(20,0,0,0.8); box-shadow: var(--glow);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+
+        .header h1 { font-family: 'Orbitron'; font-size: 22px; color: var(--neon); margin: 0; text-shadow: var(--glow); }
+
+        /* BOX LOG DENGAN SCROLL */
+        #console {
+            background: #000; border: 1px solid #444; height: 100px; 
+            font-size: 10px; color: #0f0; overflow-y: auto; padding: 8px; margin-bottom: 20px;
+            box-shadow: inset 0 0 10px #030;
+        }
+
         .card {
-            background: rgba(15, 0, 0, 0.9); border: 1px solid #444;
-            padding: 10px; margin-bottom: 10px; border-left: 3px solid var(--neon);
+            background: rgba(10, 10, 10, 0.9); border: 1px solid #333;
+            padding: 12px; margin-bottom: 12px; position: relative;
+            transition: 0.3s;
         }
-        .card-title { font-size: 11px; color: var(--neon); font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
+        .card:active { border-color: var(--neon); box-shadow: var(--glow); }
+        .card-title { font-size: 11px; color: var(--neon); font-weight: bold; margin-bottom: 10px; letter-spacing: 1px; }
 
-        /* BUTTONS */
-        .btn-main {
-            width: 100%; padding: 15px; background: linear-gradient(45deg, #600, #f00);
-            color: white; border: none; font-family: 'Orbitron'; font-weight: 900;
-            cursor: pointer; text-shadow: 0 0 5px #000; margin-top: 5px;
+        /* BUTTON LAUNCHER */
+        .btn-launch {
+            width: 100%; padding: 20px; background: #900; color: #fff;
+            border: none; font-family: 'Orbitron'; font-weight: 900;
+            font-size: 16px; cursor: pointer; letter-spacing: 3px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            margin-top: 10px; transition: 0.2s;
         }
-        .btn-main:active { transform: scale(0.95); }
+        .btn-launch:hover { background: #f00; box-shadow: 0 0 30px #f00; }
 
-        /* CHECKBOX CUSTOM */
-        .row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
-        .status { color: #555; font-weight: bold; transition: 0.3s; }
-        .active { color: #0f0; text-shadow: 0 0 5px #0f0; }
+        /* FAKE DIAMOND COUNTER */
+        .dm-box { display: flex; align-items: center; justify-content: center; gap: 10px; color: #0cf; font-weight: bold; margin-bottom: 10px;}
+        
+        .status-dot { height: 10px; width: 10px; background: #0f0; border-radius: 50%; display: inline-block; box-shadow: 0 0 5px #0f0; }
     </style>
 </head>
-<body>
+<body onclick="initAudio()">
+
+    <audio id="snd-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="snd-inject" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
     <div class="header">
-        <h1>R3X OVERLORD V3</h1>
-        <p style="font-size: 9px; margin: 0;">LICENSE: BG-KIY-OFFICIAL-2026</p>
+        <h1>R3X SUPREME V4</h1>
+        <p style="font-size: 10px; color: #888;">COMMISSIONER: BG KIY | <span class="status-dot"></span> ONLINE</p>
     </div>
 
-    <div id="log-box">
-        > System Initializing...<br>
-        > Checking Device: SAMSUNG A04...<br>
-        > Status: Security Bypassed...
+    <div id="console">> System standby...</div>
+
+    <div class="card">
+        <div class="dm-box">
+            <img src="https://garenashell.id/assets/images/diamond.png" width="20" alt="dm">
+            <span id="dm-count">999,999</span>
+        </div>
+        <div class="card-title">CURRENCY MODIFIER (VISUAL)</div>
+        <button onclick="addDm()" style="width:100%; background:#111; color:#0cf; border:1px solid #0cf; font-family:inherit; padding:5px;">GENERATE DIAMONDS</button>
     </div>
 
     <div class="card">
-        <div class="card-title">AIMBOT CONFIG (VIP)</div>
-        <div class="row">Auto Headshot <span class="status" id="s1">OFF</span></div>
-        <input type="range" oninput="activate(1)">
-        <div class="row" style="margin-top:10px;">Aim Lock 100% <span class="status" id="s2">OFF</span></div>
-        <input type="range" oninput="activate(2)">
+        <div class="card-title">AIM CONTROL & ESP</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+            <span>AIMLOCK (AUTO)</span>
+            <button onclick="playBtn(); addLog('Aimlock: ON')" style="background:#0f0; border:none; padding:2px 10px; font-size:10px;">AKTIFKAN</button>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+            <span>ANTENNA VIEW</span>
+            <button onclick="playBtn(); addLog('Antenna: ON')" style="background:#0f0; border:none; padding:2px 10px; font-size:10px;">AKTIFKAN</button>
+        </div>
     </div>
 
-    <div class="card">
-        <div class="card-title">VISUAL & ESP</div>
-        <div class="row">Antenna View 1000M <span class="status" id="s3">OFF</span></div>
-        <div class="row">Wallhack (VVIP) <span class="status" id="s4">OFF</span></div>
-        <button onclick="activate(3); activate(4);" style="font-size:10px; background:#222; color:#fff; border:1px solid #444;">ACTIVATE ALL ESP</button>
-    </div>
-
-    <button class="btn-main" onclick="launchFF()">EXECUTE & LAUNCH FF</button>
+    <button class="btn-launch" onclick="execute()">LAUNCH FREE FIRE</button>
 
     <script>
-        // Animasi Log
-        const logBox = document.getElementById('log-box');
-        const logs = [
-            "> Connecting to Garena Server...",
-            "> Injecting Cheat Pack v3.2...",
-            "> Bypassing Anticheat...",
-            "> Success! System Ready.",
-            "> Waiting for Launch Command..."
-        ];
-        let i = 0;
-        setInterval(() => {
-            if(i < logs.length) {
-                logBox.innerHTML += logs[i] + "<br>";
-                i++;
-            }
-        }, 1500);
+        let audioStarted = false;
 
-        function activate(id) {
-            document.getElementById('s' + id).innerText = "ACTIVE";
-            document.getElementById('s' + id).classList.add('active');
+        // Inisialisasi Audio (Harus ada interaksi user pertama kali)
+        function initAudio() {
+            if(!audioStarted) {
+                speak("Welcome back, Commissioner BG KIY. System R3X version four is ready to inject.");
+                addLog("System Voice Activated...");
+                audioStarted = true;
+            }
         }
 
-        function launchFF() {
-            alert("INJEKSI BERHASIL, BG KIY!\nPanel akan tetap berjalan di background.");
-            window.location.href = "intent:#Intent;package=com.dts.freefireth;end";
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'en-US'; // Suara robot cewek bahasa Inggris biar mewah
+            msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+
+        function addLog(text) {
+            const console = document.getElementById('console');
+            console.innerHTML += `> ${text}<br>`;
+            console.scrollTop = console.scrollHeight;
+            document.getElementById('snd-click').play();
+        }
+
+        function addDm() {
+            speak("Generating unlimited diamonds to your account.");
+            addLog("Injecting Diamonds...");
+            let count = 0;
+            let interval = setInterval(() => {
+                count += 12345;
+                document.getElementById('dm-count').innerText = count.toLocaleString();
+                if(count > 999999) {
+                    clearInterval(interval);
+                    addLog("Diamond Injection Success!");
+                }
+            }, 50);
+        }
+
+        function playBtn() {
+            document.getElementById('snd-click').play();
+        }
+
+        function execute() {
+            document.getElementById('snd-inject').play();
+            speak("Injection process complete. Opening Free Fire now. Good luck, BG KIY.");
+            addLog("Executing Deep Link...");
+            setTimeout(() => {
+                window.location.href = "intent:#Intent;package=com.dts.freefireth;end";
+            }, 2000);
         }
     </script>
 </body>
-    </html>
+            </html>
