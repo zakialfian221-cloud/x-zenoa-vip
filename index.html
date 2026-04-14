@@ -3,117 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R3X V3 - THE DIGITAL NEXUS</title>
+    <title>R3X V3 SUPREME | BG KIY</title>
     <link rel="manifest" href="manifest.json">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Share+Tech+Mono&display=swap');
         
-        :root { --neon: #ff0000; --bg: #050000; }
+        :root { --neon: #ff0000; --bg: #050000; --glow: rgba(255, 0, 0, 0.5); }
         
         body {
             background-color: var(--bg); color: #fff;
             font-family: 'Share Tech Mono', monospace; margin: 0; padding: 10px;
-            background-image: radial-gradient(circle, #200000 0%, #000 100%);
-            border: 2px solid #300; min-height: 98vh; overflow-x: hidden;
+            min-height: 98vh; overflow-x: hidden;
+            border: 2px solid #200;
         }
 
-        /* ANIMASI RADAR */
-        .radar {
-            position: fixed; top: 50%; left: 50%; width: 200px; height: 200px;
-            border: 1px solid rgba(255,0,0,0.2); border-radius: 50%;
-            transform: translate(-50%, -50%); pointer-events: none; z-index: 0;
-        }
-        .radar::after {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: conic-gradient(from 0deg, transparent, rgba(255,0,0,0.4));
-            border-radius: 50%; animation: rotate 3s linear infinite;
-        }
-        @keyframes rotate { 100% { transform: rotate(360deg); } }
+        /* HEADER DENGAN ANIMASI */
+        .header { text-align: center; margin-bottom: 15px; border: 1px solid var(--neon); padding: 10px; box-shadow: 0 0 15px var(--glow); }
+        .header h1 { font-family: 'Orbitron'; font-size: 20px; color: var(--neon); margin: 0; letter-spacing: 2px; }
 
-        .header { text-align: center; margin-bottom: 20px; z-index: 5; position: relative; }
-        .header h1 { font-family: 'Orbitron'; font-size: 22px; color: var(--neon); text-shadow: 0 0 20px var(--neon); margin: 0; }
+        /* LOG INJECTOR (BIAR KEREN) */
+        #log-box {
+            background: #000; border: 1px solid #333; height: 80px; 
+            font-size: 9px; color: #0f0; overflow-y: hidden; padding: 5px; margin-bottom: 15px;
+        }
 
-        /* FLOATING MENU STYLE */
+        /* CARD STYLE */
         .card {
-            background: rgba(10,0,0,0.85); border: 1px solid #400;
-            padding: 12px; margin-bottom: 10px; position: relative; z-index: 5;
-            backdrop-filter: blur(5px); box-shadow: 0 0 10px rgba(255,0,0,0.1);
+            background: rgba(15, 0, 0, 0.9); border: 1px solid #444;
+            padding: 10px; margin-bottom: 10px; border-left: 3px solid var(--neon);
         }
-        .card-title { font-size: 11px; color: var(--neon); border-bottom: 1px solid #400; margin-bottom: 8px; font-weight: bold; }
+        .card-title { font-size: 11px; color: var(--neon); font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
 
-        .btn-action {
-            width: 100%; padding: 12px; background: #900; color: #fff;
-            border: 1px solid var(--neon); font-family: 'Orbitron'; cursor: pointer;
-            margin-top: 5px; font-weight: bold; font-size: 12px;
+        /* BUTTONS */
+        .btn-main {
+            width: 100%; padding: 15px; background: linear-gradient(45deg, #600, #f00);
+            color: white; border: none; font-family: 'Orbitron'; font-weight: 900;
+            cursor: pointer; text-shadow: 0 0 5px #000; margin-top: 5px;
         }
+        .btn-main:active { transform: scale(0.95); }
 
-        /* LIVE COORDINATES */
-        #coords { font-size: 9px; color: #0f0; margin: 10px 0; height: 15px; }
-
-        /* PULSING STATUS */
-        .dot { height: 8px; width: 8px; background-color: #0f0; border-radius: 50%; display: inline-block; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        /* CHECKBOX CUSTOM */
+        .row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+        .status { color: #555; font-weight: bold; transition: 0.3s; }
+        .active { color: #0f0; text-shadow: 0 0 5px #0f0; }
     </style>
 </head>
 <body>
 
-    <div class="radar"></div>
-
     <div class="header">
-        <h1>R3X PANEL V3</h1>
-        <div id="coords">X: 192.168.1.1 | Y: 0.00342</div>
-        <div style="font-size: 10px;"><span class="dot"></span> SYSTEM ONLINE: BG KIY</div>
+        <h1>R3X OVERLORD V3</h1>
+        <p style="font-size: 9px; margin: 0;">LICENSE: BG-KIY-OFFICIAL-2026</p>
+    </div>
+
+    <div id="log-box">
+        > System Initializing...<br>
+        > Checking Device: SAMSUNG A04...<br>
+        > Status: Security Bypassed...
     </div>
 
     <div class="card">
-        <div class="card-title">MODUL INJEKSI (AUTO ON)</div>
-        <div style="display:flex; justify-content:space-between; font-size:12px;">
-            <span>ANTENNA VIEW</span> <span style="color:#0f0">ACTIVE</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:5px;">
-            <span>AUTO HEADSHOT</span> <span style="color:#0f0">99%</span>
-        </div>
+        <div class="card-title">AIMBOT CONFIG (VIP)</div>
+        <div class="row">Auto Headshot <span class="status" id="s1">OFF</span></div>
+        <input type="range" oninput="activate(1)">
+        <div class="row" style="margin-top:10px;">Aim Lock 100% <span class="status" id="s2">OFF</span></div>
+        <input type="range" oninput="activate(2)">
     </div>
 
     <div class="card">
-        <div class="card-title">SETTINGAN SENSI VIP</div>
-        <button class="btn-action" onclick="copySensi()" style="background:#222; font-size:10px;">COPY DATA CONFIG</button>
+        <div class="card-title">VISUAL & ESP</div>
+        <div class="row">Antenna View 1000M <span class="status" id="s3">OFF</span></div>
+        <div class="row">Wallhack (VVIP) <span class="status" id="s4">OFF</span></div>
+        <button onclick="activate(3); activate(4);" style="font-size:10px; background:#222; color:#fff; border:1px solid #444;">ACTIVATE ALL ESP</button>
     </div>
 
-    <div class="card">
-        <div class="card-title">VIRTUAL LAUNCHER</div>
-        <button class="btn-action" onclick="launchGame()">EXECUTE & OPEN FF</button>
-    </div>
-
-    <div style="text-align: center; color: #444; font-size: 8px; margin-top: 20px;">
-        SECURITY BYPASS: BYPASSED <br>
-        DEVELOPED BY R3X CLOUD
-    </div>
-
-    <audio id="soundEnter" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <button class="btn-main" onclick="launchFF()">EXECUTE & LAUNCH FF</button>
 
     <script>
-        // Efek koordinat jalan terus
+        // Animasi Log
+        const logBox = document.getElementById('log-box');
+        const logs = [
+            "> Connecting to Garena Server...",
+            "> Injecting Cheat Pack v3.2...",
+            "> Bypassing Anticheat...",
+            "> Success! System Ready.",
+            "> Waiting for Launch Command..."
+        ];
+        let i = 0;
         setInterval(() => {
-            let x = Math.random() * 1000;
-            let y = Math.random() * 1000;
-            document.getElementById('coords').innerText = `X: ${x.toFixed(4)} | Y: ${y.toFixed(4)} | TARGET: LOCKED`;
-        }, 100);
+            if(i < logs.length) {
+                logBox.innerHTML += logs[i] + "<br>";
+                i++;
+            }
+        }, 1500);
 
-        function copySensi() {
-            navigator.clipboard.writeText("Sensi FF: 100, 95, 80, 75 (R3X CONFIG)");
-            alert("CONFIG BERHASIL DISALIN!\nTempel di folder data Free Fire lo, BG KIY.");
+        function activate(id) {
+            document.getElementById('s' + id).innerText = "ACTIVE";
+            document.getElementById('s' + id).classList.add('active');
         }
 
-        function launchGame() {
-            document.getElementById('soundEnter').play();
-            alert("MENGAKTIFKAN FLOATING OVERLAY...\nSISTEM SIAP DIGUNAKAN!");
-            
-            // Mencoba membuka FF
-            setTimeout(() => {
-                window.location.href = "intent:#Intent;package=com.dts.freefireth;end";
-            }, 1000);
+        function launchFF() {
+            alert("INJEKSI BERHASIL, BG KIY!\nPanel akan tetap berjalan di background.");
+            window.location.href = "intent:#Intent;package=com.dts.freefireth;end";
         }
     </script>
 </body>
-</html>
+    </html>
