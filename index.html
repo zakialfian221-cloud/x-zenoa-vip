@@ -3,168 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>X3_R3X_V2</title>
+    <title>X3_HACKER_CRACKER_V5</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             background: #000; 
-            color: #0ff; 
-            font-family: 'Orbitron', sans-serif; 
+            color: #0f0; /* Hijau Matrix */
+            font-family: 'Courier New', monospace; 
             overflow: hidden; 
             display: flex; 
             align-items: center; 
             justify-content: center;
             height: 100vh;
         }
-        #ui {
+        
+        /* Canvas Matrix Background */
+        #bgCanvas {
             position: absolute;
-            top: 15px;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            text-shadow: 0 0 10px #0ff;
-            font-weight: bold;
-            pointer-events: none;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1; /* Paling belakang */
+            filter: blur(1px); /* Sedikit blur biar gak ganggu mata */
         }
-        canvas {
-            border: 2px solid #0ff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            touch-action: none;
+
+        /* UI Hacker Style */
+        #ui { 
+            position: absolute; 
+            top: 10px; 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-around; 
+            text-shadow: 0 0 8px #0f0; 
+            font-weight: bold; 
+            pointer-events: none; 
+            z-index: 10; 
+            font-size: 16px; 
+            letter-spacing: 2px;
+        }
+
+        /* Terminal Log palsu */
+        #terminal {
+            position: absolute;
+            bottom: 50px; left: 15px;
+            width: 250px;
+            height: 100px;
+            color: #0f0;
+            font-size: 10px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 5;
+            background: rgba(0,0,0,0.5);
+            padding: 5px;
+            border-left: 2px solid #0f0;
+        }
+
+        /* Canvas Game Utama */
+        #gameCanvas { 
+            border: 2px solid #0f0; 
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4); 
+            touch-action: none; 
+            background: rgba(0,0,0,0.7); /* Transparan dikit biar Matrix keliatan */
         }
     </style>
 </head>
 <body>
 
+    <canvas id="bgCanvas"></canvas>
+
     <div id="ui">
+        <div>CORE_INTEGRITY: <span id="integrity">100</span>%</div>
         <div>SCORE: <span id="score">0</span></div>
-        <div>LEVEL: <span id="lvl">1</span></div>
+        <div>ACTIVE_BALLS: <span id="ballCount">1</span></div>
     </div>
-    <canvas id="game"></canvas>
+
+    <div id="terminal">
+        <p>[SYSTEM_BOOT: OK]</p>
+        <p>[TARGET_FOUND: IL2CPP.SO]</p>
+        <div id="logs"></div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
 
 <script>
-    const canvas = document.getElementById("game");
+    // --- MATRIX BG SYSTEM ---
+    const bgC = document.getElementById("bgCanvas");
+    const bgCtx = bgC.getContext("2d");
+    bgC.width = window.innerWidth;
+    bgC.height = window.innerHeight;
+    
+    const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$&*";
+    const fontSize = 14;
+    const columns = Math.floor(bgC.width / fontSize);
+    const drops = new Array(columns).fill(1);
+
+    function drawMatrix() {
+        bgCtx.fillStyle = "rgba(0,0,0,0.05)";
+        bgCtx.fillRect(0,0,bgC.width,bgC.height);
+        bgCtx.fillStyle = "#030"; // Hijau Tua buat trail
+        bgCtx.font = fontSize + "px monospace";
+        for(let i=0; i<drops.length; i++) {
+            const text = matrixChars[Math.floor(Math.random()*matrixChars.length)];
+            bgCtx.fillText(text, i*fontSize, drops[i]*fontSize);
+            if(drops[i]*fontSize > bgC.height && Math.random() > 0.975) drops[i]=0;
+            drops[i]++;
+        }
+    }
+    setInterval(drawMatrix, 50);
+
+    // --- GAME SYSTEM ---
+    const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const scoreEl = document.getElementById("score");
-    const lvlEl = document.getElementById("lvl");
+    const ballCountEl = document.getElementById("ballCount");
+    const logsEl = document.getElementById("logs");
 
     canvas.width = window.innerWidth * 0.95;
     canvas.height = window.innerHeight * 0.8;
 
-    // --- AUDIO SYSTEM (X3 SYNTH) ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playSound(freq, type, duration) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
+    function playSound(f, t, d, v=0.1) {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+        g.gain.setValueAtTime(v, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + d);
     }
 
-    // --- GAME VARIABLES ---
-    let score = 0;
-    let level = 1;
-    let gameActive = true;
+    // Terminal Logger
+    function addLog(text) {
+        const p = document.createElement('p');
+        p.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
+        logsEl.appendChild(p);
+        if(logsEl.childElementCount > 6) logsEl.removeChild(logsEl.firstChild);
+    }
 
-    const ball = { x: canvas.width/2, y: canvas.height-50, r: 8, dx: 4, dy: -4, color: "#ff00ff" };
-    const paddle = { w: 100, h: 12, x: (canvas.width-100)/2, color: "#0ff" };
+    let score = 0;
+    let gameActive = true;
+    let integrity = 100;
+    // type: 0=cyan, 1=fire(nembus)
+    let balls = [{ x: canvas.width/2, y: canvas.height-100, r: 8, dx: 5, dy: -5, color: "#0ff", type: 0 }];
+    const paddle = { w: 130, h: 12, x: (canvas.width-130)/2, color: "#0f0" };
     
-    // --- TARGETS (BRICKS) ---
-    const brickRows = 4;
-    const brickCols = 5;
+    const brickRows = 6;
+    const brickCols = 7;
     const bricks = [];
-    const bW = (canvas.width / brickCols) - 10;
-    const bH = 20;
+    const bW = (canvas.width / brickCols) - 6;
+    const bH = 18;
 
     function initBricks() {
         for(let r=0; r<brickRows; r++) {
             bricks[r] = [];
             for(let c=0; c<brickCols; c++) {
-                bricks[r][c] = { x: c*(bW+10)+5, y: r*(bH+10)+50, status: 1 };
+                bricks[r][c] = { x: c*(bW+5)+3, y: r*(bH+5)+60, status: 1 };
             }
         }
     }
     initBricks();
 
-    // --- CONTROLS ---
     canvas.addEventListener("touchmove", (e) => {
         if(audioCtx.state === 'suspended') audioCtx.resume();
-        let touchX = e.touches[0].clientX - canvas.offsetLeft;
-        paddle.x = touchX - paddle.w/2;
+        let tX = e.touches[0].clientX - canvas.offsetLeft;
+        paddle.x = tX - paddle.w/2;
         if(paddle.x < 0) paddle.x = 0;
         if(paddle.x + paddle.w > canvas.width) paddle.x = canvas.width - paddle.w;
         e.preventDefault();
     }, {passive:false});
 
-    function draw() {
+    function spawnFireBall(x, y) {
+        balls.push({
+            x: x, y: y, r: 8,
+            dx: (Math.random() - 0.5) * 10, dy: -5,
+            color: "#f00", // Merah Fireball
+            type: 1
+        });
+        playSound(100, 'sawtooth', 0.2, 0.3); 
+        addLog("MALWARE DETECTED: FIREBALL_INJECT");
+    }
+
+    function update() {
         if(!gameActive) return;
-        ctx.fillStyle = "rgba(0,0,0,0.2)";
+        
+        // Sedikit transparan biar Matrix di belakang keliatan dikit
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw Bricks
+        // Bricks Logic (Digital Blocks)
         bricks.forEach((row, r) => {
-            row.forEach((b, c) => {
+            row.forEach((b) => {
                 if(b.status === 1) {
-                    ctx.fillStyle = `hsl(${r * 60}, 100%, 50%)`;
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = ctx.fillStyle;
+                    ctx.fillStyle = `rgba(0, ${255 - (r*30)}, 0, 0.8)`; // Gradasi Hijau
+                    ctx.shadowBlur = 5;
+                    ctx.shadowColor = "#0f0";
                     ctx.fillRect(b.x, b.y, bW, bH);
                     
-                    // Collision Ball vs Brick
-                    if(ball.x > b.x && ball.x < b.x+bW && ball.y > b.y && ball.y < b.y+bH) {
-                        ball.dy = -ball.dy;
-                        b.status = 0;
-                        score += 10;
-                        scoreEl.innerText = score;
-                        playSound(440 + (r*100), 'square', 0.1); // Sound hit
-                    }
+                    balls.forEach(ball => {
+                        if(b.status === 1 && ball.x > b.x && ball.x < b.x+bW && ball.y > b.y && ball.y < b.y+bH) {
+                            if(ball.type === 0) ball.dy = -ball.dy; 
+                            
+                            b.status = 0;
+                            score += 20;
+                            scoreEl.innerText = score;
+                            playSound(400 + (r*60), 'square', 0.05);
+
+                            // Peluang spawn FIREBALL (18%)
+                            if(Math.random() < 0.18) {
+                                spawnFireBall(b.x + bW/2, b.y);
+                                paddle.w = Math.min(paddle.w + 10, 260); 
+                            }
+                        }
+                    });
                 }
             });
         });
 
-        // Draw Paddle
+        // Paddle Render (Cyber Interface)
         ctx.fillStyle = paddle.color;
         ctx.shadowBlur = 15;
-        ctx.fillRect(paddle.x, canvas.height-30, paddle.w, paddle.h);
+        ctx.shadowColor = "#0f0";
+        ctx.fillRect(paddle.x, canvas.height-35, paddle.w, paddle.h);
 
-        // Draw Ball
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
-        ctx.fillStyle = ball.color;
-        ctx.fill();
+        // Balls Render
+        balls.forEach((ball, index) => {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+            ctx.fillStyle = ball.color;
+            ctx.shadowBlur = ball.type === 1 ? 25 : 10; 
+            ctx.shadowColor = ball.color;
+            ctx.fill();
 
-        // Bounce Logic
-        if(ball.x + ball.dx > canvas.width || ball.x + ball.dx < 0) {
-            ball.dx = -ball.dx;
-            playSound(200, 'sine', 0.05);
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Wall Bounce
+            if(ball.x + ball.r > canvas.width || ball.x - ball.r < 0) ball.dx = -ball.dx;
+            if(ball.y - ball.r < 0) ball.dy = -ball.dy;
+
+            // Paddle Hit
+            if(ball.y + ball.r > canvas.height-35 && ball.x > paddle.x && ball.x < paddle.x+paddle.w) {
+                ball.dy = -Math.abs(ball.dy);
+                ball.dx += (Math.random() - 0.5) * 2; // Physics Jitter
+                playSound(600, 'triangle', 0.05);
+            }
+
+            // Lose ball
+            if(ball.y > canvas.height) {
+                balls.splice(index, 1);
+            }
+        });
+
+        ballCountEl.innerText = balls.length;
+
+        // Core Integrity Logic (Nyawa palsu)
+        if(balls.length === 0) {
+            integrity -= 25;
+            document.getElementById("integrity").innerText = integrity;
+            if(integrity > 0) {
+                // Spawn bola baru kalo masih punya nyawa
+                balls.push({ x: canvas.width/2, y: canvas.height-100, r: 8, dx: 5, dy: -5, color: "#0ff", type: 0 });
+                paddle.w = 130; // Reset pedal
+                addLog(`CORE_BREACH! Integrity: ${integrity}%`);
+                playSound(100, 'sine', 0.5, 0.3);
+            } else {
+                gameActive = false;
+                addLog("SYSTEM_FAILURE! CAUSE: CORE_ZERO");
+                playSound(50, 'sawtooth', 1.5, 0.4);
+                alert("R3X_SYSTEM: CRITICAL_FAILURE. Access Revoked. Final Score: " + score);
+                location.reload();
+            }
         }
-        if(ball.y + ball.dy < 0) {
-            ball.dy = -ball.dy;
-            playSound(200, 'sine', 0.05);
-        }
 
-        // Paddle Hit
-        if(ball.y + ball.dy > canvas.height-30 && ball.x > paddle.x && ball.x < paddle.x+paddle.w) {
-            ball.dy = -Math.abs(ball.dy);
-            playSound(600, 'triangle', 0.1);
-        } else if(ball.y > canvas.height) {
-            gameActive = false;
-            playSound(100, 'sawtooth', 0.5);
-            alert("SYSTEM CRITICAL: GAME OVER");
-            location.reload();
-        }
-
-        ball.x += ball.dx;
-        ball.y += ball.dy;
-
-        requestAnimationFrame(draw);
+        requestAnimationFrame(update);
     }
-
-    draw();
+    update();
 </script>
 </body>
-</html>
+    </html>
