@@ -3,150 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>X3_R3X_SYSTEM</title>
+    <title>X3_R3X_V2</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            background: #050505; 
+            background: #000; 
             color: #0ff; 
-            font-family: sans-serif; 
+            font-family: 'Orbitron', sans-serif; 
             overflow: hidden; 
             display: flex; 
-            flex-direction: column;
             align-items: center; 
             justify-content: center;
             height: 100vh;
         }
-        #status {
+        #ui {
             position: absolute;
-            top: 10px;
-            font-family: 'Courier New', monospace;
+            top: 15px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
             text-shadow: 0 0 10px #0ff;
             font-weight: bold;
-            letter-spacing: 2px;
+            pointer-events: none;
         }
         canvas {
-            display: block;
             border: 2px solid #0ff;
-            background: #000;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-            touch-action: none; /* Penting buat kontrol HP */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            touch-action: none;
         }
     </style>
 </head>
 <body>
 
-    <div id="status">X3_SYSTEM // SCORE: <span id="score">0</span></div>
+    <div id="ui">
+        <div>SCORE: <span id="score">0</span></div>
+        <div>LEVEL: <span id="lvl">1</span></div>
+    </div>
     <canvas id="game"></canvas>
 
 <script>
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
-    const scoreDisplay = document.getElementById("score");
+    const scoreEl = document.getElementById("score");
+    const lvlEl = document.getElementById("lvl");
 
-    // Setting Ukuran Responsif
     canvas.width = window.innerWidth * 0.95;
     canvas.height = window.innerHeight * 0.8;
 
+    // --- AUDIO SYSTEM (X3 SYNTH) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(freq, type, duration) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // --- GAME VARIABLES ---
     let score = 0;
+    let level = 1;
     let gameActive = true;
 
-    // Objek Bola (Neon Pink)
-    const ball = {
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        radius: 10,
-        speedX: 5,
-        speedY: 5,
-        color: "#ff00ff"
-    };
+    const ball = { x: canvas.width/2, y: canvas.height-50, r: 8, dx: 4, dy: -4, color: "#ff00ff" };
+    const paddle = { w: 100, h: 12, x: (canvas.width-100)/2, color: "#0ff" };
+    
+    // --- TARGETS (BRICKS) ---
+    const brickRows = 4;
+    const brickCols = 5;
+    const bricks = [];
+    const bW = (canvas.width / brickCols) - 10;
+    const bH = 20;
 
-    // Objek Pedal (Neon Cyan)
-    const paddle = {
-        width: 120,
-        height: 15,
-        x: (canvas.width - 120) / 2,
-        y: canvas.height - 40,
-        color: "#00ffff"
-    };
+    function initBricks() {
+        for(let r=0; r<brickRows; r++) {
+            bricks[r] = [];
+            for(let c=0; c<brickCols; c++) {
+                bricks[r][c] = { x: c*(bW+10)+5, y: r*(bH+10)+50, status: 1 };
+            }
+        }
+    }
+    initBricks();
 
-    // Kontrol Sentuh (Touch Control)
+    // --- CONTROLS ---
     canvas.addEventListener("touchmove", (e) => {
-        let rect = canvas.getBoundingClientRect();
-        let touchX = e.touches[0].clientX - rect.left;
-        paddle.x = touchX - paddle.width / 2;
-
-        // Batasi biar gak keluar canvas
-        if (paddle.x < 0) paddle.x = 0;
-        if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
-        
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        let touchX = e.touches[0].clientX - canvas.offsetLeft;
+        paddle.x = touchX - paddle.w/2;
+        if(paddle.x < 0) paddle.x = 0;
+        if(paddle.x + paddle.w > canvas.width) paddle.x = canvas.width - paddle.w;
         e.preventDefault();
-    }, { passive: false });
+    }, {passive:false});
 
     function draw() {
-        if (!gameActive) return;
-
-        // Effect Trail (Bikin bayangan halus)
-        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        if(!gameActive) return;
+        ctx.fillStyle = "rgba(0,0,0,0.2)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Gambar Bola
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        ctx.fillStyle = ball.color;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = ball.color;
-        ctx.fill();
-        ctx.closePath();
+        // Draw Bricks
+        bricks.forEach((row, r) => {
+            row.forEach((b, c) => {
+                if(b.status === 1) {
+                    ctx.fillStyle = `hsl(${r * 60}, 100%, 50%)`;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = ctx.fillStyle;
+                    ctx.fillRect(b.x, b.y, bW, bH);
+                    
+                    // Collision Ball vs Brick
+                    if(ball.x > b.x && ball.x < b.x+bW && ball.y > b.y && ball.y < b.y+bH) {
+                        ball.dy = -ball.dy;
+                        b.status = 0;
+                        score += 10;
+                        scoreEl.innerText = score;
+                        playSound(440 + (r*100), 'square', 0.1); // Sound hit
+                    }
+                }
+            });
+        });
 
-        // Gambar Pedal
-        ctx.beginPath();
-        ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, 5);
+        // Draw Paddle
         ctx.fillStyle = paddle.color;
         ctx.shadowBlur = 15;
-        ctx.shadowColor = paddle.color;
+        ctx.fillRect(paddle.x, canvas.height-30, paddle.w, paddle.h);
+
+        // Draw Ball
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+        ctx.fillStyle = ball.color;
         ctx.fill();
-        ctx.closePath();
 
-        // Logika Pergerakan Bola
-        ball.x += ball.speedX;
-        ball.y += ball.speedY;
-
-        // Pantulan Dinding Samping
-        if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
-            ball.speedX = -ball.speedX;
+        // Bounce Logic
+        if(ball.x + ball.dx > canvas.width || ball.x + ball.dx < 0) {
+            ball.dx = -ball.dx;
+            playSound(200, 'sine', 0.05);
+        }
+        if(ball.y + ball.dy < 0) {
+            ball.dy = -ball.dy;
+            playSound(200, 'sine', 0.05);
         }
 
-        // Pantulan Dinding Atas
-        if (ball.y - ball.radius < 0) {
-            ball.speedY = -ball.speedY;
-        }
-
-        // Pantulan Pedal
-        if (ball.y + ball.radius > paddle.y && 
-            ball.x > paddle.x && 
-            ball.x < paddle.x + paddle.width) {
-            
-            ball.speedY = -Math.abs(ball.speedY); // Balik arah ke atas
-            score++;
-            scoreDisplay.innerText = score;
-            
-            // Efek Speed Up tiap skor nambah
-            ball.speedX *= 1.02;
-            ball.speedY *= 1.02;
-        }
-
-        // Game Over (Bola jatuh)
-        if (ball.y - ball.radius > canvas.height) {
+        // Paddle Hit
+        if(ball.y + ball.dy > canvas.height-30 && ball.x > paddle.x && ball.x < paddle.x+paddle.w) {
+            ball.dy = -Math.abs(ball.dy);
+            playSound(600, 'triangle', 0.1);
+        } else if(ball.y > canvas.height) {
             gameActive = false;
-            alert("R3X SYSTEM CRITICAL ERROR! Score: " + score);
+            playSound(100, 'sawtooth', 0.5);
+            alert("SYSTEM CRITICAL: GAME OVER");
             location.reload();
         }
+
+        ball.x += ball.dx;
+        ball.y += ball.dy;
 
         requestAnimationFrame(draw);
     }
 
-    // Start System
     draw();
 </script>
 </body>
