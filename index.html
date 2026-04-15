@@ -2,160 +2,152 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R3X V4 ULTIMATE | BG KIY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>X3_R3X_SYSTEM</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Share+Tech+Mono&display=swap');
-        
-        :root { --neon: #ff0000; --bg: #030000; --glow: 0 0 15px rgba(255, 0, 0, 0.7); }
-        
-        body {
-            background-color: var(--bg); color: #fff;
-            font-family: 'Share Tech Mono', monospace; margin: 0; padding: 15px;
-            min-height: 100vh; overflow-x: hidden;
-            border: 2px solid #300;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #050505; 
+            color: #0ff; 
+            font-family: sans-serif; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+            height: 100vh;
         }
-
-        /* ANIMASI BACKGROUND SCAN */
-        body::after {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(255,0,0,0.03) 0px, rgba(255,0,0,0.03) 1px, transparent 1px, transparent 2px);
-            pointer-events: none; z-index: 10;
+        #status {
+            position: absolute;
+            top: 10px;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px #0ff;
+            font-weight: bold;
+            letter-spacing: 2px;
         }
-
-        .header { 
-            text-align: center; margin-bottom: 20px; border: 2px double var(--neon); 
-            padding: 15px; background: rgba(20,0,0,0.8); box-shadow: var(--glow);
-            animation: pulse 2s infinite;
+        canvas {
+            display: block;
+            border: 2px solid #0ff;
+            background: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            touch-action: none; /* Penting buat kontrol HP */
         }
-        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
-
-        .header h1 { font-family: 'Orbitron'; font-size: 22px; color: var(--neon); margin: 0; text-shadow: var(--glow); }
-
-        /* BOX LOG DENGAN SCROLL */
-        #console {
-            background: #000; border: 1px solid #444; height: 100px; 
-            font-size: 10px; color: #0f0; overflow-y: auto; padding: 8px; margin-bottom: 20px;
-            box-shadow: inset 0 0 10px #030;
-        }
-
-        .card {
-            background: rgba(10, 10, 10, 0.9); border: 1px solid #333;
-            padding: 12px; margin-bottom: 12px; position: relative;
-            transition: 0.3s;
-        }
-        .card:active { border-color: var(--neon); box-shadow: var(--glow); }
-        .card-title { font-size: 11px; color: var(--neon); font-weight: bold; margin-bottom: 10px; letter-spacing: 1px; }
-
-        /* BUTTON LAUNCHER */
-        .btn-launch {
-            width: 100%; padding: 20px; background: #900; color: #fff;
-            border: none; font-family: 'Orbitron'; font-weight: 900;
-            font-size: 16px; cursor: pointer; letter-spacing: 3px;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-            margin-top: 10px; transition: 0.2s;
-        }
-        .btn-launch:hover { background: #f00; box-shadow: 0 0 30px #f00; }
-
-        /* FAKE DIAMOND COUNTER */
-        .dm-box { display: flex; align-items: center; justify-content: center; gap: 10px; color: #0cf; font-weight: bold; margin-bottom: 10px;}
-        
-        .status-dot { height: 10px; width: 10px; background: #0f0; border-radius: 50%; display: inline-block; box-shadow: 0 0 5px #0f0; }
     </style>
 </head>
-<body onclick="initAudio()">
+<body>
 
-    <audio id="snd-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
-    <audio id="snd-inject" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+    <div id="status">X3_SYSTEM // SCORE: <span id="score">0</span></div>
+    <canvas id="game"></canvas>
 
-    <div class="header">
-        <h1>R3X SUPREME V4</h1>
-        <p style="font-size: 10px; color: #888;">COMMISSIONER: BG KIY | <span class="status-dot"></span> ONLINE</p>
-    </div>
+<script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreDisplay = document.getElementById("score");
 
-    <div id="console">> System standby...</div>
+    // Setting Ukuran Responsif
+    canvas.width = window.innerWidth * 0.95;
+    canvas.height = window.innerHeight * 0.8;
 
-    <div class="card">
-        <div class="dm-box">
-            <img src="https://garenashell.id/assets/images/diamond.png" width="20" alt="dm">
-            <span id="dm-count">999,999</span>
-        </div>
-        <div class="card-title">CURRENCY MODIFIER (VISUAL)</div>
-        <button onclick="addDm()" style="width:100%; background:#111; color:#0cf; border:1px solid #0cf; font-family:inherit; padding:5px;">GENERATE DIAMONDS</button>
-    </div>
+    let score = 0;
+    let gameActive = true;
 
-    <div class="card">
-        <div class="card-title">AIM CONTROL & ESP</div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-            <span>AIMLOCK (AUTO)</span>
-            <button onclick="playBtn(); addLog('Aimlock: ON')" style="background:#0f0; border:none; padding:2px 10px; font-size:10px;">AKTIFKAN</button>
-        </div>
-        <div style="display:flex; justify-content:space-between;">
-            <span>ANTENNA VIEW</span>
-            <button onclick="playBtn(); addLog('Antenna: ON')" style="background:#0f0; border:none; padding:2px 10px; font-size:10px;">AKTIFKAN</button>
-        </div>
-    </div>
+    // Objek Bola (Neon Pink)
+    const ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 10,
+        speedX: 5,
+        speedY: 5,
+        color: "#ff00ff"
+    };
 
-    <button class="btn-launch" onclick="execute()">LAUNCH FREE FIRE</button>
+    // Objek Pedal (Neon Cyan)
+    const paddle = {
+        width: 120,
+        height: 15,
+        x: (canvas.width - 120) / 2,
+        y: canvas.height - 40,
+        color: "#00ffff"
+    };
 
-    <script>
-        let audioStarted = false;
+    // Kontrol Sentuh (Touch Control)
+    canvas.addEventListener("touchmove", (e) => {
+        let rect = canvas.getBoundingClientRect();
+        let touchX = e.touches[0].clientX - rect.left;
+        paddle.x = touchX - paddle.width / 2;
 
-        // Inisialisasi Audio (Harus ada interaksi user pertama kali)
-        function initAudio() {
-            if(!audioStarted) {
-                speak("Welcome back, Commissioner BG KIY. System R3X version four is ready to inject.");
-                addLog("System Voice Activated...");
-                audioStarted = true;
-            }
-        }
-
-        function speak(text) {
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = text;
-            msg.lang = 'en-US'; // Suara robot cewek bahasa Inggris biar mewah
-            msg.rate = 0.9;
-            window.speechSynthesis.speak(msg);
-        }
-
-        function addLog(text) {
-            const console = document.getElementById('console');
-            console.innerHTML += `> ${text}<br>`;
-            console.scrollTop = console.scrollHeight;
-            document.getElementById('snd-click').play();
-        }
-
-        function addDm() {
-            speak("Generating unlimited diamonds to your account.");
-            addLog("Injecting Diamonds...");
-            let count = 0;
-            let interval = setInterval(() => {
-                count += 12345;
-                document.getElementById('dm-count').innerText = count.toLocaleString();
-                if(count > 999999) {
-                    clearInterval(interval);
-                    addLog("Diamond Injection Success!");
-                }
-            }, 50);
-        }
-
-        function playBtn() {
-            document.getElementById('snd-click').play();
-        }
-
-        function execute() {
-    document.getElementById('snd-inject').play();
-    speak("Injeksi selesai. Membuka Free Fire sekarang.");
-    addLog("Forcing Application Launch...");
-
-    // TEKNIK DEEP LINK BRUTE FORCE
-    setTimeout(() => {
-        // Coba buka pake skema langsung
-        window.location.href = "freefire://"; 
+        // Batasi biar gak keluar canvas
+        if (paddle.x < 0) paddle.x = 0;
+        if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
         
-        // Backup kalau cara di atas gagal (Ganti ke Intent yang lebih keras)
-        setTimeout(() => {
-            window.location.href = "intent:#Intent;package=com.dts.freefireth;component=com.dts.freefireth/com.dts.freefireth.MainActivity;end";
-        }, 500);
-    }, 1500);
+        e.preventDefault();
+    }, { passive: false });
+
+    function draw() {
+        if (!gameActive) return;
+
+        // Effect Trail (Bikin bayangan halus)
+        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Gambar Bola
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = ball.color;
+        ctx.fill();
+        ctx.closePath();
+
+        // Gambar Pedal
+        ctx.beginPath();
+        ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, 5);
+        ctx.fillStyle = paddle.color;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = paddle.color;
+        ctx.fill();
+        ctx.closePath();
+
+        // Logika Pergerakan Bola
+        ball.x += ball.speedX;
+        ball.y += ball.speedY;
+
+        // Pantulan Dinding Samping
+        if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+            ball.speedX = -ball.speedX;
         }
+
+        // Pantulan Dinding Atas
+        if (ball.y - ball.radius < 0) {
+            ball.speedY = -ball.speedY;
+        }
+
+        // Pantulan Pedal
+        if (ball.y + ball.radius > paddle.y && 
+            ball.x > paddle.x && 
+            ball.x < paddle.x + paddle.width) {
+            
+            ball.speedY = -Math.abs(ball.speedY); // Balik arah ke atas
+            score++;
+            scoreDisplay.innerText = score;
+            
+            // Efek Speed Up tiap skor nambah
+            ball.speedX *= 1.02;
+            ball.speedY *= 1.02;
+        }
+
+        // Game Over (Bola jatuh)
+        if (ball.y - ball.radius > canvas.height) {
+            gameActive = false;
+            alert("R3X SYSTEM CRITICAL ERROR! Score: " + score);
+            location.reload();
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    // Start System
+    draw();
+</script>
+</body>
+</html>
