@@ -2,220 +2,119 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>X3_R3X_SOCCER_HD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X3_CYBER_CALCULATOR</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #000; 
-            color: #0ff; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            overflow: hidden; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            height: 100vh;
-        }
-        
-        /* Overlay UI HD */
-        #hud {
-            position: absolute;
-            top: 20px;
-            width: 90%;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
+        body {
+            background: #050505;
             display: flex;
-            justify-content: space-between;
-            z-index: 100;
-            text-shadow: 0 0 15px #0ff;
-            font-weight: 800;
-            letter-spacing: 3px;
-            pointer-events: none;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #0f0;
         }
-
-        canvas {
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
-            box-shadow: 0 0 50px rgba(0, 0, 0, 1);
-            touch-action: none;
+        .calc-body {
+            background: #000;
+            width: 320px;
+            padding: 20px;
+            border: 2px solid #0f0;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
         }
-
-        /* Scanline Effect biar kelihatan Techy */
-        body::after {
-            content: " ";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-            z-index: 1000;
+        #display {
+            width: 100%;
+            height: 60px;
+            background: #0a0a0a;
+            border: 1px solid #0f0;
+            margin-bottom: 20px;
+            text-align: right;
+            padding: 15px;
+            font-size: 24px;
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
+            outline: none;
         }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            height: 50px;
+            background: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:active {
+            background: #0f0;
+            color: #000;
+            box-shadow: 0 0 15px #0f0;
+        }
+        .btn-op { color: #0ff; border-color: #0ff; }
+        .btn-eq { grid-column: span 2; color: #ff0; border-color: #ff0; }
+        .btn-clear { grid-column: span 2; color: #f00; border-color: #f00; }
     </style>
 </head>
 <body>
 
-    <div id="hud">
-        <div id="score">SCORE: 000</div>
-        <div id="msg">X3_ULTRA_HD_ACTIVE</div>
+    <div class="calc-body">
+        <input type="text" id="display" readonly value="0">
+        <div class="buttons">
+            <button class="btn-clear" onclick="clearDisplay()">CLEAR</button>
+            <button class="btn-op" onclick="del()">DEL</button>
+            <button class="btn-op" onclick="input('/')">/</button>
+            
+            <button onclick="input('7')">7</button>
+            <button onclick="input('8')">8</button>
+            <button onclick="input('9')">9</button>
+            <button class="btn-op" onclick="input('*')">*</button>
+            
+            <button onclick="input('4')">4</button>
+            <button onclick="input('5')">5</button>
+            <button onclick="input('6')">6</button>
+            <button class="btn-op" onclick="input('-')">-</button>
+            
+            <button onclick="input('1')">1</button>
+            <button onclick="input('2')">2</button>
+            <button onclick="input('3')">3</button>
+            <button class="btn-op" onclick="input('+')">+</button>
+            
+            <button onclick="input('0')">0</button>
+            <button onclick="input('.')">.</button>
+            <button class="btn-eq" onclick="calculate()">=</button>
+        </div>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
+    <script>
+        const display = document.getElementById('display');
 
-<script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    const scoreEl = document.getElementById("score");
-
-    // HD Resolution Setup
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * 0.95 * dpr;
-    canvas.height = window.innerHeight * 0.85 * dpr;
-    canvas.style.width = (canvas.width / dpr) + "px";
-    canvas.style.height = (canvas.height / dpr) + "px";
-    ctx.scale(dpr, dpr);
-
-    let score = 0;
-    let gameActive = true;
-    let width = canvas.width / dpr;
-    let height = canvas.height / dpr;
-
-    // HD Ball with Glow
-    const ball = {
-        x: width / 2,
-        y: height / 2,
-        r: 12,
-        dx: 6,
-        dy: -6,
-        color: "#00ffff"
-    };
-
-    // HD Paddle with Neon Pulse
-    const paddle = {
-        w: 130,
-        h: 14,
-        x: (width - 130) / 2,
-        y: height - 40,
-        color: "#00ffff"
-    };
-
-    // Particle System buat efek hancur
-    let particles = [];
-    function createParticles(x, y, color) {
-        for(let i=0; i<8; i++) {
-            particles.push({
-                x: x, y: y,
-                dx: (Math.random() - 0.5) * 6,
-                dy: (Math.random() - 0.5) * 6,
-                life: 1,
-                color: color
-            });
-        }
-    }
-
-    // Brick System
-    const rows = 5;
-    const cols = 6;
-    const bricks = [];
-    const bW = (width / cols) - 10;
-    const bH = 25;
-
-    for(let r=0; r<rows; r++) {
-        bricks[r] = [];
-        for(let c=0; c<cols; c++) {
-            bricks[r][c] = { x: c*(bW+10)+5, y: r*(bH+10)+70, status: 1 };
-        }
-    }
-
-    canvas.addEventListener("touchmove", (e) => {
-        let touchX = e.touches[0].clientX - canvas.offsetLeft;
-        paddle.x = touchX - paddle.w / 2;
-        if(paddle.x < 0) paddle.x = 0;
-        if(paddle.x + paddle.w > width) paddle.x = width - paddle.w;
-        e.preventDefault();
-    }, {passive: false});
-
-    function draw() {
-        if(!gameActive) return;
-
-        // Motion Blur Effect
-        ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
-        ctx.fillRect(0, 0, width, height);
-
-        // Draw Bricks with Glow
-        bricks.forEach((row, r) => {
-            row.forEach((b) => {
-                if(b.status === 1) {
-                    let hue = (r * 40) + 180;
-                    ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.8)`;
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = `hsla(${hue}, 100%, 50%, 1)`;
-                    ctx.beginPath();
-                    ctx.roundRect(b.x, b.y, bW, bH, 4);
-                    ctx.fill();
-
-                    if(ball.x > b.x && ball.x < b.x+bW && ball.y > b.y && ball.y < b.y+bH) {
-                        ball.dy = -ball.dy;
-                        b.status = 0;
-                        score += 50;
-                        scoreEl.innerText = "SCORE: " + score.toString().padStart(3, '0');
-                        createParticles(b.x + bW/2, b.y + bH/2, `hsla(${hue}, 100%, 50%, 1)`);
-                    }
-                }
-            });
-        });
-
-        // Draw Particles
-        particles.forEach((p, i) => {
-            p.x += p.dx; p.y += p.dy; p.life -= 0.02;
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = p.life;
-            ctx.fillRect(p.x, p.y, 3, 3);
-            if(p.life <= 0) particles.splice(i, 1);
-        });
-        ctx.globalAlpha = 1;
-
-        // Draw Paddle HD
-        const pGrad = ctx.createLinearGradient(paddle.x, 0, paddle.x + paddle.w, 0);
-        pGrad.addColorStop(0, "#008888");
-        pGrad.addColorStop(0.5, "#00ffff");
-        pGrad.addColorStop(1, "#008888");
-        ctx.fillStyle = pGrad;
-        ctx.shadowBlur = 25;
-        ctx.shadowColor = "#00ffff";
-        ctx.beginPath();
-        ctx.roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 7);
-        ctx.fill();
-
-        // Draw Ball HD
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
-        ctx.fillStyle = "#fff";
-        ctx.shadowBlur = 30;
-        ctx.shadowColor = "#0ff";
-        ctx.fill();
-
-        // Physics
-        ball.x += ball.dx;
-        ball.y += ball.dy;
-
-        if(ball.x + ball.r > width || ball.x - ball.r < 0) ball.dx = -ball.dx;
-        if(ball.y - ball.r < 0) ball.dy = -ball.dy;
-
-        if(ball.y + ball.r > paddle.y && ball.x > paddle.x && ball.x < paddle.x + paddle.w) {
-            ball.dy = -Math.abs(ball.dy);
-            ball.dx = (ball.x - (paddle.x + paddle.w/2)) * 0.2; // Sudut pantul dinamis
+        function input(v) {
+            if (display.value === '0') display.value = v;
+            else display.value += v;
         }
 
-        if(ball.y > height) {
-            gameActive = false;
-            alert("R3X_SYSTEM: CONNECTION LOST\nFINAL SCORE: " + score);
-            location.reload();
+        function clearDisplay() {
+            display.value = '0';
         }
 
-        ctx.shadowBlur = 0; // Reset shadow buat performa
-        requestAnimationFrame(draw);
-    }
+        function del() {
+            display.value = display.value.slice(0, -1);
+            if (display.value === '') display.value = '0';
+        }
 
-    draw();
-</script>
+        function calculate() {
+            try {
+                // eval() aman di sini karena input dikontrol tombol
+                display.value = eval(display.value);
+            } catch (e) {
+                display.value = 'ERROR';
+                setTimeout(clearDisplay, 1000);
+            }
+        }
+    </script>
 </body>
 </html>
